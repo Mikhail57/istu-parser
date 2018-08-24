@@ -1,4 +1,4 @@
-package ru.mustakimov.istuparser.news
+package ru.mustakimov.istuparser.model
 
 data class Category(
         val id: Int,

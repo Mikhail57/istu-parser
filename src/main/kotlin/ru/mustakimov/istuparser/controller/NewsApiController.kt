@@ -1,10 +1,13 @@
-package ru.mustakimov.istuparser.news
+package ru.mustakimov.istuparser.controller
 
 import org.jsoup.Jsoup
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ru.mustakimov.istuparser.model.Category
+import ru.mustakimov.istuparser.model.News
+import kotlin.streams.toList
 
 @RestController
 @RequestMapping("news")
@@ -14,6 +17,11 @@ class NewsApiController {
     fun listNews(@RequestParam("page", defaultValue = "1") page: Int): List<News> {
         val webpage = Jsoup.connect("https://www.istu.edu/news/?PAGEN_1=$page").get()
         val news = webpage.select(".newslist-item")
+        val lst = news.stream().parallel().map {
+            val doc = Jsoup.connect(it.selectFirst("h4 a").absUrl("href")).get()
+            doc.selectFirst(".content").html()
+        }.toList().map { "--------------------------\n$it\n--------------------------" }
+        println(lst)
         return news.map {
             val titleLinkElem = it.selectFirst("h4 a")
             News(
