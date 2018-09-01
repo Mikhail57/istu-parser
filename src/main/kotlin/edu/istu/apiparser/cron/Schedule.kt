@@ -7,11 +7,18 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import edu.istu.apiparser.model.Class
+import edu.istu.apiparser.model.News
+import edu.istu.apiparser.repository.NewsNetworkRepository
+import edu.istu.apiparser.repository.NewsWrapper
 import edu.istu.apiparser.repository.ScheduleWrapper
 import java.io.StringReader
+import java.util.stream.IntStream
+import kotlin.streams.toList
 
 @Component
-class Schedule(private val restTemplate: RestTemplate, private val wrapper: ScheduleWrapper) {
+class Schedule(private val restTemplate: RestTemplate,
+               private val wrapper: ScheduleWrapper,
+               private val newsWrapper: NewsWrapper) {
     @Scheduled(cron = "0 */5 * * * *")
     fun getSchedule() {
         val entity = restTemplate.getForEntity<String>("http://www.istu.edu/schedule/export/schedule_exp.txt")
@@ -45,6 +52,22 @@ class Schedule(private val restTemplate: RestTemplate, private val wrapper: Sche
         }
         println("--------------------------")
         println("       GOT SCHEDULE       ")
+        println("--------------------------")
+    }
+
+    @Scheduled(fixedDelay = 300_000)
+    fun getNews() {
+        println("--------------------------")
+        println("       GETTING NEWS       ")
+        println("--------------------------")
+        val newsNetworkRepository = NewsNetworkRepository()
+        val news: List<List<News>> = IntStream.range(1, NewsWrapper.CACHED_PAGES).parallel().mapToObj {
+            println("Getting news page $it")
+            newsNetworkRepository.getNews(it)
+        }.toList()
+        newsWrapper.news = news
+        println("--------------------------")
+        println("         GOT NEWS         ")
         println("--------------------------")
     }
 }
