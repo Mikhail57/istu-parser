@@ -1,12 +1,15 @@
-package ru.mustakimov.istuparser.controller
+package edu.istu.apiparser.controller
 
 import org.jsoup.Jsoup
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.mustakimov.istuparser.model.Category
-import ru.mustakimov.istuparser.model.News
+import edu.istu.apiparser.model.Category
+import edu.istu.apiparser.model.News
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.streams.toList
 
 @RestController
@@ -19,18 +22,18 @@ class NewsApiController {
         val news = webpage.select(".newslist-item")
         val lst = news.stream().parallel().map {
             val doc = Jsoup.connect(it.selectFirst("h4 a").absUrl("href")).get()
-            doc.selectFirst(".content").html()
-        }.toList().map { "--------------------------\n$it\n--------------------------" }
-        println(lst)
-        return news.map {
-            val titleLinkElem = it.selectFirst("h4 a")
+            doc.selectFirst(".content").children().next().next().text()
+        }.toList().map { if (it.length > 128) it.substring(0, 128) else it }
+        return news.mapIndexed { index, element ->
+            val titleLinkElem = element.selectFirst("h4 a")
             News(
                     id = titleLinkElem.attr("href").split("/")[2].toLong(),
                     title = titleLinkElem.text(),
-                    date = it.selectFirst(".news-date").text(),
-                    categories = it.select(".new-razdel-item").map { cat -> getCategory(cat.text()) },
+                    date = element.selectFirst(".news-date").text(),
+                    categories = element.select(".new-razdel-item").map { cat -> getCategory(cat.text()) },
                     url = titleLinkElem.absUrl("href"),
-                    image = it.selectFirst(".listnews-img").absUrl("src"))
+                    image = element.selectFirst(".listnews-img").absUrl("src"),
+                    shortDesc = lst[index])
         }
     }
 

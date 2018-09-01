@@ -1,4 +1,4 @@
-package ru.mustakimov.istuparser.config
+package edu.istu.apiparser.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

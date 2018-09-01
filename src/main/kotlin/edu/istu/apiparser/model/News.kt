@@ -1,4 +1,4 @@
-package ru.mustakimov.istuparser.model
+package edu.istu.apiparser.model
 
 data class News(
         val id: Long,
@@ -6,5 +6,6 @@ data class News(
         val date: String,
         val categories: List<Category>,
         val url: String,
-        val image: String
+        val image: String,
+        val shortDesc: String
 )

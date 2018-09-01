@@ -1,4 +1,4 @@
-package ru.mustakimov.istuparser
+package edu.istu.apiparser
 
 import org.junit.Test
 import org.junit.runner.RunWith

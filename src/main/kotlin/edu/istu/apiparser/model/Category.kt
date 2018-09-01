@@ -1,4 +1,4 @@
-package ru.mustakimov.istuparser.model
+package edu.istu.apiparser.model
 
 data class Category(
         val id: Int,

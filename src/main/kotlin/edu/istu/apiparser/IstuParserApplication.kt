@@ -1,4 +1,4 @@
-package ru.mustakimov.istuparser
+package edu.istu.apiparser
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
