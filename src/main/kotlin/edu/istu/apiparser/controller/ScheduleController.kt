@@ -2,7 +2,6 @@ package edu.istu.apiparser.controller
 
 import com.opencsv.CSVParserBuilder
 import com.opencsv.CSVReaderBuilder
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -10,11 +9,10 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import edu.istu.apiparser.model.Class
+import edu.istu.apiparser.model.Faculty
 import edu.istu.apiparser.model.Teacher
 import edu.istu.apiparser.repository.ScheduleWrapper
 import java.io.StringReader
-import java.util.concurrent.atomic.AtomicInteger
-import java.util.concurrent.atomic.AtomicLong
 
 @RestController
 @RequestMapping("/schedule")
@@ -42,8 +40,16 @@ class ScheduleController(private val restTemplate: RestTemplate, private val wra
     }
 
     @GetMapping("groups")
-    fun getGroups(): Map<Int, List<String>> {
-        return wrapper.schedule.groupBy { it.course }.mapValues { it.value.map { it.group }.toSet().toList() }
+    fun getGroups(): List<Faculty> {
+        return wrapper.schedule
+                .groupBy { it.faculty }
+                .mapValues {
+                    it.value
+                            .groupBy { it.course }
+                            .mapValues { it.value.map { it.group }.toSet().toList() }
+                }
+                .map { Faculty(it.key, it.value) }
+//        return wrapper.schedule.groupBy { it.course }.mapValues { it.value.map { it.group }.toSet().toList() }
     }
 
     @GetMapping("/group/{group}")
