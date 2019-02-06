@@ -7,10 +7,12 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.client.getForEntity
 import edu.istu.apiparser.model.Class
+import edu.istu.apiparser.model.NewsPost
 import edu.istu.apiparser.model.NewsPostShort
 import edu.istu.apiparser.repository.NewsNetworkRepository
 import edu.istu.apiparser.repository.NewsWrapper
 import edu.istu.apiparser.repository.ScheduleWrapper
+import edu.istu.apiparser.util.toShort
 import java.io.StringReader
 import java.util.stream.IntStream
 import kotlin.streams.toList
@@ -61,7 +63,7 @@ class Schedule(private val restTemplate: RestTemplate,
         println("       GETTING NEWS       ")
         println("--------------------------")
         val newsNetworkRepository = NewsNetworkRepository()
-        val news: List<List<NewsPostShort>> = IntStream.range(1, NewsWrapper.CACHED_PAGES).parallel().mapToObj {
+        val news: List<List<NewsPost>> = IntStream.range(1, NewsWrapper.CACHED_PAGES).parallel().mapToObj {
             println("Getting news page $it")
             newsNetworkRepository.getNews(it)
         }.toList()
