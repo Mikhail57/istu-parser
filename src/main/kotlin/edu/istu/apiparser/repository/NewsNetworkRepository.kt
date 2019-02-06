@@ -1,12 +1,12 @@
 package edu.istu.apiparser.repository
 
 import edu.istu.apiparser.model.Category
-import edu.istu.apiparser.model.News
+import edu.istu.apiparser.model.NewsPostShort
 import org.jsoup.Jsoup
 import kotlin.streams.toList
 
 class NewsNetworkRepository {
-    fun getNews(page: Int): List<News> {
+    fun getNews(page: Int): List<NewsPostShort> {
         val webpage = Jsoup.connect("https://www.istu.edu/news/?PAGEN_1=$page").get()
         val news = webpage.select(".newslist-item")
         val lst = news.stream().parallel().map {
@@ -15,7 +15,7 @@ class NewsNetworkRepository {
         }.toList().map { if (it.length > 128) it.substring(0, 128) else it }
         return news.mapIndexed { index, element ->
             val titleLinkElem = element.selectFirst("h4 a")
-            News(
+            NewsPostShort(
                     id = titleLinkElem.attr("href").split("/")[2].toLong(),
                     title = titleLinkElem.text(),
                     date = element.selectFirst(".news-date").text(),

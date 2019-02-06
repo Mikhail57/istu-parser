@@ -1,6 +1,6 @@
 package edu.istu.apiparser.model
 
-data class News(
+data class NewsPostShort(
         val id: Long,
         val title: String,
         val date: String,
