@@ -1,7 +1,6 @@
 package edu.istu.apiparser.repository
 
 import edu.istu.apiparser.model.NewsPost
-import edu.istu.apiparser.model.NewsPostShort
 
 class NewsWrapper(
         @Volatile

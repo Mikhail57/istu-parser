@@ -5,7 +5,6 @@ import edu.istu.apiparser.model.NewsPostShort
 import edu.istu.apiparser.repository.NewsNetworkRepository
 import edu.istu.apiparser.repository.NewsWrapper
 import edu.istu.apiparser.util.toShort
-import org.jsoup.Jsoup
 import org.springframework.web.bind.annotation.*
 
 @RestController
