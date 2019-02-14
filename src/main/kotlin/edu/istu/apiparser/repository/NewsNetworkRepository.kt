@@ -3,6 +3,7 @@ package edu.istu.apiparser.repository
 import edu.istu.apiparser.model.Category
 import edu.istu.apiparser.model.Image
 import edu.istu.apiparser.model.NewsPost
+import edu.istu.apiparser.util.changeAttrToAbsUrl
 import org.jsoup.Jsoup
 import kotlin.streams.toList
 
@@ -27,12 +28,12 @@ class NewsNetworkRepository {
         val images = if (gallery.size > 0) gallery[0].children().map { element ->
             when {
                 element.`is`("a") -> Image(
-                        full = element.absUrl("href"),
-                        mini = element.children().first()?.absUrl("src") ?: TODO("Error on post with id $postId")
+                    full = element.absUrl("href"),
+                    mini = element.children().first()?.absUrl("src") ?: TODO("Error on post with id $postId")
                 )
                 element.`is`("img") -> Image(
-                        full = element.absUrl("src"),
-                        mini = element.absUrl("src")
+                    full = element.absUrl("src"),
+                    mini = element.absUrl("src")
                 )
                 else -> TODO("Unknown element at gallery of post $postId: $element")
             }
@@ -41,23 +42,48 @@ class NewsNetworkRepository {
         val categories = allPageContent.select(".new-razdel-item").map { cat -> getCategory(cat.text()) }
         val title = allPageContent.select("h1").text()
         val titleImage = allPageContent.select(".news-header").select("img")[0].absUrl("src")
+
+        val links = content.select("a")
+        links.changeAttrToAbsUrl("href")
+
+        val imagesInLinks = links.select("img").remove().map {
+            Image(
+                full = it.absUrl("src"),
+                mini = it.absUrl("src")
+            )
+        }
+        val contentImages = content.select("img").remove().map {
+            Image(
+                full = it.absUrl("src"),
+                mini = it.absUrl("src")
+            )
+        }
+
+        val allImages = imagesInLinks + images + contentImages
+
+        val contentWithoutImages = content.not("img").not(".zoom-image")
+//        val imgs = content.select("img")
+//        imgs.changeAttrToAbsUrl("src")
+
         return NewsPost(
-                id = postId,
-                url = url,
-                title = title,
-                date = date,
-                categories = categories,
-                content = content.html(),
-                mainImageUrl = titleImage,
-                images = images
+            id = postId,
+            url = url,
+            title = title,
+            date = date,
+            categories = categories,
+            content = contentWithoutImages.html(),
+            mainImageUrl = titleImage,
+            images = allImages
         )
     }
 
     // Для добавления категорий необходимо добавлять их в конец списка
-    private val categories = listOf("Общественная жизнь", "Инновации", "Наука",
-            "Международная деятельность", "Образование", "Воспитание, культура, спорт, здоровье", "Студентам",
-            "Об университете", "Спорт", "Абитуриентам", "Культура", "Сотрудникам и преподавателям",
-            "Выпускникам и работодателям", "Национальный исследовательский университет", "Пресс-служба")
+    private val categories = listOf(
+        "Общественная жизнь", "Инновации", "Наука",
+        "Международная деятельность", "Образование", "Воспитание, культура, спорт, здоровье", "Студентам",
+        "Об университете", "Спорт", "Абитуриентам", "Культура", "Сотрудникам и преподавателям",
+        "Выпускникам и работодателям", "Национальный исследовательский университет", "Пресс-служба"
+    )
 
     private fun getCategory(title: String) = Category(categories.indexOf(title), title)
 }
