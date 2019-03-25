@@ -32,23 +32,28 @@ class ScheduledTasks(private val restTemplate: RestTemplate,
             it.size == headers.size
         }.map {
             it.map(String::trim)
-        }.map {
-            val day = it[0].toInt()
-            val everyWeek = it[1].toInt()
-            val beginTime = it[2]
-            val endTime = it[3]
-            val aud = it[4]
-            val prep = it[5]
-            val title = it[6]
-            val type = it[7]
-            val faculty = it[8]
-            val group = it[9]
-            val course = it[10].toInt()
-            val ngroup = it[11]
-            val dayBegin = it[12]
-            val dayEnd = it[13]
-            val prepId = it[14]
-            Class(title, aud, group, prep, prepId, beginTime, endTime, course, faculty, dayBegin, dayEnd, type, day, everyWeek)
+        }.mapNotNull {
+            try {
+                val day = it[0].toInt()
+                val everyWeek = it[1].toInt()
+                val beginTime = it[2]
+                val endTime = it[3]
+                val aud = it[4]
+                val prep = it[5]
+                val title = it[6]
+                val type = it[7]
+                val faculty = it[8]
+                val group = it[9]
+                val course = it[10].toInt()
+                val ngroup = it[11]
+                val dayBegin = it[12]
+                val dayEnd = it[13]
+                val prepId = it[14]
+                Class(title, aud, group, prep, prepId, beginTime, endTime, course, faculty, dayBegin, dayEnd, type, day, everyWeek)
+            } catch (e: Exception) {
+                println("An error occurred during processing $it\t\t\t$e")
+                null
+            }
         }
         println("--------------------------")
         println("       GOT SCHEDULE       ")
